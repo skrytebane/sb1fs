@@ -126,3 +126,13 @@ Før transaktionsfiler kan det vara logiska att sætta timestamp till betalingsd
 transaktioner før ett visst konto kronologiskt med:
 
     $ ls -lt
+	
+### D: Utforsk din egen bank sine API'er
+Her er lenker til noen av de andre norske bankene som tilbyr API. Se etter mer informasjon i deres portaler
+
+* [Danske Bank's Open Banking and APIs](https://danskebank.com/openbanking)
+* [DNB Developer](https://developer.dnb.no/)
+* [Nordea | Open Banking Developer Portal](https://developer.nordeaopenbanking.com/)
+* [Sbanken](https://sbanken.no/bruke/utviklerportalen/)
+* [Sparebank1](https://developersparebank1.no/)
+* [Sparebanken Vest](https://github.com/SparebankenVest)
