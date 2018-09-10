@@ -5,9 +5,6 @@
 
 Se till att få installert [prerequisties før din plattform](README.md#prerequisites)
 
-SB1: Tilbakemeldingsskjema: https://tinyurl.com/jzsb1
-
-
 ### Uppgift 
 
 **1) Clone'a detta repo**
