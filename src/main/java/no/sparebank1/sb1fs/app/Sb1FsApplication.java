@@ -5,6 +5,7 @@ import com.mashape.unirest.http.Unirest;
 import no.sparebank1.sb1fs.api.accounts.Account;
 import no.sparebank1.sb1fs.api.accounts.Sb1Accounts;
 import no.sparebank1.sb1fs.fs.DirNode;
+import no.sparebank1.sb1fs.fs.FileNode;
 import no.sparebank1.sb1fs.fs.Node;
 import no.sparebank1.sb1fs.fs.Sb1fs;
 import no.sparebank1.sb1fs.util.Java8Util;
@@ -14,11 +15,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.Arrays.asList;
 import static no.sparebank1.sb1fs.util.CommandLine.*;
 
 
@@ -72,6 +75,6 @@ public class Sb1FsApplication {
          *
          */
 
-        return Collections.emptyList();
+        return asList(new DirNode("saldo", asList(new FileNode(new DecimalFormat("#.00").format(account.getAvailableBalance().getAmount()) + ".kr", "Available balance"))));
     }
 }
