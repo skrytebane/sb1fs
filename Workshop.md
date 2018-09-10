@@ -87,7 +87,7 @@ Installera med:
     
 och, givet JSON-data i filen transactions.json, prøv:
 
-    $ quicktype -o . --top-level ApiAccounts --lang java --package no.sparebank1.sb1fs.api.transactions transactions.json 
+    $ quicktype -o . --top-level ApiTransactions --lang java --package no.sparebank1.sb1fs.api.transactions transactions.json 
 
  * Ønskar du inte att testa ut quicktype så kan DTO-klasser før transaktionsdata hæmtas in med git:
  
