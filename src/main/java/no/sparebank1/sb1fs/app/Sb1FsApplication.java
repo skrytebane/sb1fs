@@ -2,9 +2,13 @@ package no.sparebank1.sb1fs.app;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
+import io.vavr.Tuple;
 import no.sparebank1.sb1fs.api.accounts.Account;
+import no.sparebank1.sb1fs.api.accounts.Balance;
 import no.sparebank1.sb1fs.api.accounts.Sb1Accounts;
+import no.sparebank1.sb1fs.api.transactions.APITransactions;
 import no.sparebank1.sb1fs.fs.DirNode;
+import no.sparebank1.sb1fs.fs.FileNode;
 import no.sparebank1.sb1fs.fs.Node;
 import no.sparebank1.sb1fs.fs.Sb1fs;
 import no.sparebank1.sb1fs.util.Java8Util;
@@ -15,8 +19,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static no.sparebank1.sb1fs.util.CommandLine.*;
@@ -52,9 +56,12 @@ public class Sb1FsApplication {
 
         Sb1Accounts sb1Accounts = response.getBody();
 
-        DirNode root = new DirNode("/", Arrays.stream(sb1Accounts.getAccounts()).map(account ->
-                new DirNode((account.getAccountNumber().getFormatted()+ " " + account.getName()).replaceAll("\\W", "_"), getSubnodes(account))
-        ).collect(Collectors.toList()));
+        DirNode root = new DirNode("/",
+                Arrays.stream(sb1Accounts.getAccounts())
+                        .map(account ->
+                                new DirNode((account.getAccountNumber().getFormatted() + " " + account.getName()).replaceAll("\\W", "_"),
+                                        getSubnodes(token, account))
+                        ).collect(Collectors.toList()));
 
 
         new Sb1fs(root, mountPath).mount();
@@ -63,7 +70,7 @@ public class Sb1FsApplication {
 
     }
 
-    private static List<Node> getSubnodes(Account account) {
+    private static List<Node> getSubnodes(String token, Account account) {
 
         /**
          * TODO: Implement something more interesting here!
@@ -72,6 +79,33 @@ public class Sb1FsApplication {
          *
          */
 
-        return Collections.emptyList();
+        Balance balance = account.getBalance();
+
+        return List.of(
+                new DirNode("konto", List.of(new FileNode(account.getName(), ""))),
+                new DirNode("saldo",
+                        List.of(new FileNode(balance.getAmount() + "." + (balance.getCurrencyCode().equals("NOK") ? "kr" : balance.getCurrencyCode()), ""))),
+                new DirNode("transactions", getTransactions(token, account)));
+    }
+
+    private static List<Node> getTransactions(String token, Account account) {
+        String url = account.getLinks().getTransactions().getHref();
+
+        HttpResponse<APITransactions> transactions = Java8Util.propagate(() -> Unirest.get(url)
+                .header("Accept", "application/vnd.sparebank1.v1+json")
+                .header("Authorization", "Bearer " + token)
+                .asObject(APITransactions.class));
+
+        return Arrays.stream(transactions.getBody().getTransactions())
+                .map(t ->
+                        new FileNode(String.format("%s: %-30s %3s %10.2f",
+                                t.getAccountingDate(),
+                                t.getDescription(),
+                                t.getAmount().getCurrencyCode(),
+                                t.getAmount().getAmount()),
+                                "Arkivreferanse: " + Optional.ofNullable(t.getArchiveReference()).orElse("") + "\n" +
+                                        "Transaksjonstype: " + t.getTransactionType() + "\n" +
+                                        "Fjernkonto: " + Optional.ofNullable(t.getRemoteAccount()).orElse("") + "\n"))
+                .collect(Collectors.toList());
     }
 }

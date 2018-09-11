@@ -1,0 +1,5 @@
+* Ressursar
+
+- [[https://sparebank1.github.io/sb1fs/][Presentasjon]]
+- [[https://github.com/SpareBank1/sb1fs][Github-repo]]
+- [[https://developersparebank1.no/][Utviklarportal]]
